@@ -4,5 +4,5 @@ Using the stockmarket.csv file I was able to explore the raw data inside the fil
 * Daily avg close by ticker
 * Avg volume by sector 
 * Simple daily return by ticker
-* 
+
 We then were instructed to used Streamlit to load the parquet files, add filters and visualize charts.
