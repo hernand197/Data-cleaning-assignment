@@ -42,7 +42,7 @@ print(df.info())
 print(df.isnull().sum())
 
 
-
+#for consistent data types
 target_schema = {
     "trade_date": "datetime64[ns]",
     "ticker": "string",
@@ -56,30 +56,35 @@ target_schema = {
     "notes": "string"
 }
 
+#converting numeric columns to their proper data types (float, int, float)
 df["open_price"] = pd.to_numeric(df["open_price"], errors="coerce")
 df["close_price"] = pd.to_numeric(df["close_price"], errors="coerce")
 df["volume"] = pd.to_numeric(df["volume"], errors="coerce", downcast="integer")
+#converting strings to boolean T/F
 df["validated"] = df["validated"].str.lower().map({"yes": True, "no": False})
 
+#converting the text columns to strign
 for col in ["ticker", "sector", "currency","exchange", "notes"]:
     df[col] = df[col].astype("string")
 
-
+#applying target schema
 for col, dtype in target_schema.items():
     if col in df.columns:
         df[col] = df[col].astype(dtype, errors="ignore")
-
+#printing the data types 
 print(df.dtypes)
     
-
+#removing duplicates
 df = df.drop_duplicates()
+#saving
 df.to_parquet("cleaned.parquet", index=False)
 
-
+#aggregations
 import pandas as pd
 
 df = pd.read_parquet("cleaned.parquet")
 
+#daily avg by close by ticker
 agg1 = (
     df.groupby(["trade_date", "ticker"])["close_price"]
     .mean()
@@ -89,6 +94,7 @@ agg1 = (
 #saving
 agg1.to_parquet("agg1.parquet", index=False)
 
+#avg voulme by sector
 agg2 = (
     df.groupby("sector")["volume"]
     .mean()
@@ -98,7 +104,7 @@ agg2 = (
 #saving
 agg2.to_parquet("agg2.parquet", index=False)
 
-
+#calculating daiy return
 df["daily_return"] = (df["close_price"] - df["open_price"]) / df["open_price"]
 
 agg3 = (
